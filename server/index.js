@@ -1,18 +1,31 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 
 import connectDb from './config/connectDb.js';
+import authRoutes from './routes/auth.route.js';
+import cookieParser from 'cookie-parser';
+
 
 dotenv.config();
 
 const app = express();
-connectDb();
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
 
+
+}));
+
+app.use(express.json());
+app.use(cookieParser());
+connectDb();
 const PORT = process.env.PORT || 8080;
-app.get('/', (req,res)=>{
-    return res.json({message: 'Hello World'});
-} )
+
+app.use('/api/auth', authRoutes);
+
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
