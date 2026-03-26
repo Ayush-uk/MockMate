@@ -47,7 +47,7 @@ const NavBar = () => {
             <FaRobot size={18} />
           </div>
           <h1 className="text-xl font-semibold hidden md:block">
-            Inteview.IQ.AI
+            MockMate
           </h1>
         </div>
         <div className="flex items-center gap-6 relative">
