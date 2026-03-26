@@ -56,7 +56,7 @@ const Auth = ({isModel=false}) => {
                     <FaRobot  size={18} />
 
                 </div>
-                <h2 className='font-semibold text-lg'>Inteview.IQ.AI</h2>
+                <h2 className='font-semibold text-lg'>MockMate</h2>
             </div>
             <h2 className='text-2xl md:text-3xl font-semibold text-center loading-snug mb-4'>
                 Continue with

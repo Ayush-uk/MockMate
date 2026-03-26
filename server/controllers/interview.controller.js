@@ -231,6 +231,55 @@ Make questions based on the candidate’s role, experience,interviewMode, projec
   }
 }
 
+export const speakInterviewText = async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ message: "Text is required." });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({
+        message: "OPENAI_API_KEY is missing on the server.",
+      });
+    }
+
+    const response = await fetch("https://api.openai.com/v1/audio/speech", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini-tts",
+        voice: "marin",
+        input: text.trim(),
+        instructions:
+          "Speak in a warm, friendly, supportive, and confident tone. Sound human, calm, and encouraging.",
+        response_format: "mp3",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("OpenAI speech error:", errorText);
+      return res.status(502).json({
+        message: "Failed to generate speech audio.",
+      });
+    }
+
+    const audioBuffer = Buffer.from(await response.arrayBuffer());
+
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Content-Disposition", 'inline; filename="speech.mp3"');
+    return res.send(audioBuffer);
+  } catch (error) {
+    console.error("Speech generation error:", error);
+    return res.status(500).json({ message: `failed to generate speech ${error.message}` });
+  }
+}
+
 
 export const submitAnswer = async (req, res) => {
   try {
