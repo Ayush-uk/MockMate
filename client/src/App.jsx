@@ -6,6 +6,10 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { setUserData } from './redux/userSclice'
+import InterviewPage from './pages/InterviewPage'
+import InterviewHistory from './pages/InterviewHistory'
+import Pricing from './pages/Pricing'
+import InterviewReport from './pages/InterviewReport'
 
 export const ServerUrl = import.meta.env.VITE_SERVER_URL || ""
 
@@ -30,6 +34,10 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
+       <Route path='/interview' element={<InterviewPage/>}/>
+        <Route path='/history' element={<InterviewHistory/>}/>
+      <Route path='/pricing' element={<Pricing/>}/>
+      <Route path='/report/:id' element={<InterviewReport/>}/>
     </Routes>
   
   )
