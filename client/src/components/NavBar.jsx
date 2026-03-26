@@ -66,7 +66,7 @@ const NavBar = () => {
                   <p className="text-sm text-gray-600 mb-4">
                     Need more credits to continue interviews?
                   </p>
-                  <button className="w-full bg-black text-white py-2 rounded-lg text-sm">
+                  <button onClick={()=>navigate("/pricing")} className="w-full bg-black text-white py-2 rounded-lg text-sm">
                     Buy more credits
                   </button>
                 </div>
