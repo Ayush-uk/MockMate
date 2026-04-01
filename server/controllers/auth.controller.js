@@ -1,42 +1,41 @@
+import genToken from "../config/token.js"
+import User from "../models/user.model.js"
 
-import User from "../models/user.model.js";
-import  getToken  from "../config/token.js";
 
-
-export const googleAuth = async (req, res) => {
+export const googleAuth = async (req,res) => {
     try {
-        const {name, email} = req.body;
-        let  user = await User.findOne({email})
+        const {name , email} = req.body
+        let user = await User.findOne({email})
         if(!user){
-            user = await User.create({name, email})
+            user = await User.create({
+                name , 
+                email
+            })
         }
-        const token = getToken(user._id);
-
-        res.cookie("token", token, { httpOnly: true ,secure:false, sameSite:"strict" ,maxAge: 24 * 60 * 60 * 1000});
+        let token = await genToken(user._id)
+        res.cookie("token" , token , {
+            http:true,
+            secure:false,
+            sameSite:"strict",
+            maxAge:7 * 24 * 60 * 60 * 1000
+        })
 
         return res.status(200).json(user)
-    } 
-    catch (error) {
-        console.error("Error in googleAuth:", error);
-        return res.status(500).json({ message: "Internal Server Error" });
 
+
+
+    } catch (error) {
+        return res.status(500).json({message:`Google auth error ${error}`})
     }
-
+    
 }
 
-
-export const logout = async (req, res) => {
+export const logOut = async (req,res) => {
     try {
-        await res.clearCookie("token");
-        return res.status(200).json({ message: "Logged out successfully" });
-        
+        await res.clearCookie("token")
+        return res.status(200).json({message:"LogOut Successfully"})
     } catch (error) {
-        console.error("Error in logout:", error);
-        return res.status(500).json({ message: "Internal Server Error" });
-        
+         return res.status(500).json({message:`Logout error ${error}`})
     }
-
-
-
-
+    
 }

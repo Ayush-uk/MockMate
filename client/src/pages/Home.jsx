@@ -1,5 +1,7 @@
 import React from 'react'
-import NavBar from '../components/NavBar'
+import Navbar from '../components/Navbar'
+import { useSelector } from 'react-redux'
+import { motion } from "motion/react";
 import {
   BsRobot,
   BsMic,
@@ -20,20 +22,16 @@ import resumeImg from "../assets/resume.png";
 import pdfImg from "../assets/pdf.png";
 import analyticsImg from "../assets/history.png";
 import Footer from '../components/Footer';
-import { useSelector } from 'react-redux';
-import { motion } from 'motion/react';
 
 
-
-
-const Home = () => {
-
-  const {userData} = useSelector((state)=>state.user)
+function Home() {
+  const { userData } = useSelector((state) => state.user)
   const [showAuth, setShowAuth] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   return (
-    <div className='min-h-screen bg-[#f3f3f3]  flex flex-col'>
-       <NavBar/>
+    <div className='min-h-screen bg-[#f3f3f3] flex flex-col'>
+      <Navbar />
+
       <div className='flex-1 px-6 py-20'>
         <div className='max-w-6xl mx-auto'>
 

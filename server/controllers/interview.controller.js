@@ -4,18 +4,6 @@ import { askAi } from "../services/openRouter.service.js";
 import User from "../models/user.model.js";
 import Interview from "../models/interview.model.js";
 
-const buildFallbackQuestions = ({ role, mode }) => {
-  const interviewMode = mode?.toLowerCase() || "interview";
-
-  return [
-    `Can you describe your experience as a ${role} and the projects that best show your impact so far?`,
-    "How do you usually approach solving a technical challenge when the requirements are unclear or changing quickly?",
-    `Which of your skills would be most useful for this ${interviewMode} interview, and how have you used them recently?`,
-    "Tell me about a project from your resume where you had to work under pressure and still deliver quality results.",
-    "If you joined our team tomorrow, what would you focus on first to contribute quickly in this role?",
-  ];
-};
-
 export const analyzeResume = async (req, res) => {
   try {
     if (!req.file) {
@@ -184,24 +172,27 @@ Make questions based on the candidate’s role, experience,interviewMode, projec
     ];
 
 
-    let questionsArray = [];
+    const aiResponse = await askAi(messages)
 
-    try {
-      const aiResponse = await askAi(messages);
+    if (!aiResponse || !aiResponse.trim()) {
+           
+      return res.status(500).json({
+        message: "AI returned empty response."
+      });
 
-      if (aiResponse && aiResponse.trim()) {
-        questionsArray = aiResponse
-          .split("\n")
-          .map(q => q.trim())
-          .filter(q => q.length > 0)
-          .slice(0, 5);
-      }
-    } catch (aiError) {
-      console.error("generateQuestion AI fallback:", aiError.message);
     }
 
+    const questionsArray = aiResponse
+      .split("\n")
+      .map(q => q.trim())
+      .filter(q => q.length > 0)
+      .slice(0, 5);
+
     if (questionsArray.length === 0) {
-      questionsArray = buildFallbackQuestions({ role, mode });
+      
+      return res.status(500).json({
+        message: "AI failed to generate questions."
+      });
     }
 
     user.credits -= 50;
@@ -228,55 +219,6 @@ Make questions based on the candidate’s role, experience,interviewMode, projec
     });
   } catch (error) {
     return res.status(500).json({message:`failed to create interview ${error}`})
-  }
-}
-
-export const speakInterviewText = async (req, res) => {
-  try {
-    const { text } = req.body;
-
-    if (!text || !text.trim()) {
-      return res.status(400).json({ message: "Text is required." });
-    }
-
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({
-        message: "OPENAI_API_KEY is missing on the server.",
-      });
-    }
-
-    const response = await fetch("https://api.openai.com/v1/audio/speech", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini-tts",
-        voice: "marin",
-        input: text.trim(),
-        instructions:
-          "Speak in a warm, friendly, supportive, and confident tone. Sound human, calm, and encouraging.",
-        response_format: "mp3",
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenAI speech error:", errorText);
-      return res.status(502).json({
-        message: "Failed to generate speech audio.",
-      });
-    }
-
-    const audioBuffer = Buffer.from(await response.arrayBuffer());
-
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.setHeader("Content-Disposition", 'inline; filename="speech.mp3"');
-    return res.send(audioBuffer);
-  } catch (error) {
-    console.error("Speech generation error:", error);
-    return res.status(500).json({ message: `failed to generate speech ${error.message}` });
   }
 }
 
