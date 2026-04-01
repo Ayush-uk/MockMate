@@ -11,10 +11,7 @@ import interviewRouter from "./routes/interview.route.js"
 
 const app = express()
 app.use(cors({
-    origin: [
-        'https://mockmate-1-ebcp.onrender.com',
-        'http://localhost:5173'
-    ],
+    origin:'https://mockmate-client.onrender.com',
     credentials: true
 }))
 
